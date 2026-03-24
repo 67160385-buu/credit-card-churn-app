@@ -54,20 +54,20 @@ tab1, tab2 = st.tabs(["📝 กรอกข้อมูลลูกค้า", "
 with tab1:
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("👤 ข้อมูลพื้นฐาน")
+        st.subheader("👤ข้อมูลพื้นฐาน")
         customer_age = st.slider("อายุลูกค้า", 18, 80, 35)
         gender = st.selectbox("เพศ", ["M", "F"])
-        income = st.selectbox("รายได้ต่อปี", ["Less than $40K", "$40K - $60K", "$60K - $80K", "$80K - $120K", "$120K +"])
+        income = st.selectbox("รายได้ต่อปี", ["Less than $5K", "$10K - $20K", "$50K - $55K", "$80K - $120K", "$120K +"])
         card = st.selectbox("ประเภทหน้าบัตร", ["Blue", "Silver", "Gold", "Platinum"])
     
     with col2:
-        st.subheader("💰 พฤติกรรมการใช้จ่าย")
+        st.subheader("💰พฤติกรรมการใช้จ่าย")
         months = st.number_input("เป็นลูกค้ามาแล้ว (เดือน)", 0, 120, 36)
         trans_amt = st.number_input("ยอดรูดรวม 12 เดือน ($)", 0, 50000, 4500)
         trans_ct = st.number_input("จำนวนครั้งที่รูดบัตร (ครั้ง)", 0, 500, 65)
         rev_bal = st.number_input("ยอดหนี้ค้างชำระ ($)", 0, 10000, 1500)
 
-    predict_button = st.button("🚀 เริ่มการวิเคราะห์เดี๋ยวนี้")
+    predict_button = st.button("เริ่มการวิเคราะห์เดี๋ยวนี้")
 
 if predict_button:
     with tab2:
@@ -97,7 +97,7 @@ if predict_button:
         if str(prediction) == "1":
             st.error("## ⚠️ผลลัพธ์: มีความเสี่ยงที่จะยกเลิกบัตร (Churn Risk)")
             st.markdown("""
-                **💡 คำแนะนำสำหรับฝ่ายการตลาด:**
+                **💡คำแนะนำสำหรับฝ่ายการตลาด:**
                 * ควรโทรติดต่อเพื่อสอบถามความพึงพอใจ
                 * เสนอโปรโมชั่นลดค่าธรรมเนียมรายปี
                 * เพิ่มสิทธิประโยชน์ในการแลกแต้ม
@@ -112,7 +112,7 @@ if predict_button:
             """)
         
         # เพิ่มชาร์ตเล็กๆ ให้ดูว้าว
-        st.write("🔍 **เปรียบเทียบยอดใช้จ่ายกับค่าเฉลี่ย**")
+        st.write("🔍เปรียบเทียบยอดใช้จ่ายกับค่าเฉลี่ย")
         chart_data = pd.DataFrame({
             'Category': ['ลูกค้าคนนี้', 'ค่าเฉลี่ยลูกค้าทั่วไป'],
             'ยอดใช้จ่าย ($)': [trans_amt, 4400]
