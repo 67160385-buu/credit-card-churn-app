@@ -3,9 +3,56 @@ import numpy as np
 import pandas as pd
 import joblib
 
-st.set_page_config(page_title="Credit Card Customer Prediction", page_icon="💳", layout="centered")
+# ===== การตั้งค่าหน้าเว็บแบบ Wide =====
+st.set_page_config(
+    page_title="Smart Credit Card Analytics",
+    page_icon="💳",
+    layout="wide" # ปรับเป็นจอ กว้างเพื่อให้ดูเป็น Dashboard
+)
 
-# ===== โหลดโมเดล =====
+# Custom CSS เพื่อให้ปุ่มและตัวอักษรสวยขึ้น
+st.markdown("""
+    <style>
+    /* เปลี่ยนสีพื้นหลังหลักเป็นสีเทาอ่อนมาก */
+    .stApp {
+        background-color: #f8f9fa;
+    }
+    
+    /* ปรับแต่งแถบ Sidebar ให้เป็นสีขาวสะอาด */
+    [data-testid="stSidebar"] {
+        background-color: #ffffff;
+        border-right: 1px solid #e0e0e0;
+    }
+    
+    /* ปรับแต่งการแสดงผลของ Card หรือ Metric */
+    [data-testid="stMetricValue"] {
+        color: #007bff;
+    }
+    
+    /* ปรับแต่งปุ่มให้เป็นสีน้ำเงินเข้มและขอบมน */
+    .stButton>button {
+        width: 100%;
+        border-radius: 8px;
+        height: 3em;
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        transition: 0.3s;
+    }
+    
+    .stButton>button:hover {
+        background-color: #004494;
+        border: none;
+        color: white;
+    }
+
+    /* ปรับแต่งหัวข้อ */
+    h1, h2, h3 {
+        color: #1e293b;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 @st.cache_resource
 def load_model():
     model = joblib.load("best_model.pkl") 
@@ -13,80 +60,92 @@ def load_model():
     model_columns = joblib.load("model_columns.pkl")
     return model, scaler, model_columns
 
-with st.spinner("กำลังโหลดระบบประเมินลูกค้า..."):
-    model, scaler, model_columns = load_model()
+model, scaler, model_columns = load_model()
 
-# ===== ส่วนหน้าเว็บ =====
-st.title("💳 ระบบคาดการณ์ลูกค้าบัตรเครดิต")
-st.markdown("กรอกข้อมูลพฤติกรรมการใช้จ่ายของลูกค้า เพื่อประเมินแนวโน้ม")
-st.divider()
+# ===== Sidebar Design =====
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/2830/2830284.png", width=100)
+    st.title("Customer Insights")
+    st.info("กรอกข้อมูลลูกค้าในส่วนหลักเพื่อเริ่มการวิเคราะห์")
+    st.divider()
+    st.write("📌 **Model Version:** 1.2.0 (Stable)")
+    st.write("📊 **Algorithm:** Gradient Boosting")
 
-col1, col2 = st.columns(2)
+# ===== Main UI =====
+st.title("💳 ระบบวิเคราะห์ความเสี่ยงลูกค้าบัตรเครดิต")
+st.write("---")
 
-with col1:
-    customer_age = st.number_input("อายุลูกค้า (Age)", min_value=18, max_value=100, value=35)
-    gender = st.selectbox("เพศ (Gender)", ["M", "F"])
-    income_category = st.selectbox("รายได้ต่อปี", ["Less than $40K", "$40K - $60K", "$60K - $80K", "$80K - $120K", "$120K +"])
-    card_category = st.selectbox("ประเภทบัตร", ["Blue", "Silver", "Gold", "Platinum"])
+# แบ่งส่วนกรอกข้อมูลเป็น 2 ฝั่ง
+tab1, tab2 = st.tabs(["📝 กรอกข้อมูลลูกค้า", "📊 ผลการวิเคราะห์"])
 
-with col2:
-    months_on_book = st.number_input("ระยะเวลาที่เป็นลูกค้า (เดือน)", min_value=0, value=36)
-    total_trans_amt = st.number_input("ยอดใช้จ่ายรวม 12 เดือน ($)", min_value=0, value=4500, step=500)
-    total_trans_ct = st.number_input("จำนวนครั้งที่รูดบัตร", min_value=0, value=65, step=5)
-    revolving_bal = st.number_input("ยอดหนี้คงค้าง ($)", min_value=0, value=1500, step=100)
-
-predict_button = st.button("🔍 วิเคราะห์ข้อมูลลูกค้า", use_container_width=True, type="primary")
-
-# ===== เมื่อกดปุ่มทำนาย =====
-if predict_button:
-    input_df = pd.DataFrame({
-        'Customer_Age': [customer_age],
-        'Gender': [gender],
-        'Income_Category': [income_category],
-        'Card_Category': [card_category],
-        'Months_on_book': [months_on_book],
-        'Total_Trans_Amt': [total_trans_amt],
-        'Total_Trans_Ct': [total_trans_ct],
-        'Total_Revolving_Bal': [revolving_bal]
-    })
-
-    # เตรียมข้อมูลให้ตรงกับตอน Train
-    input_encoded = pd.get_dummies(input_df)
-    input_aligned = input_encoded.reindex(columns=model_columns, fill_value=0)
-    input_scaled = scaler.transform(input_aligned)
-
-    # ทำนายผล
-    prediction = model.predict(input_scaled)[0]
+with tab1:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("👤 ข้อมูลพื้นฐาน")
+        customer_age = st.slider("อายุลูกค้า", 18, 80, 35)
+        gender = st.selectbox("เพศ", ["M", "F"])
+        income = st.selectbox("รายได้ต่อปี", ["Less than $40K", "$40K - $60K", "$60K - $80K", "$80K - $120K", "$120K +"])
+        card = st.selectbox("ประเภทหน้าบัตร", ["Blue", "Silver", "Gold", "Platinum"])
     
-    # ระบบป้องกัน Error กรณีโมเดลไม่มี predict_proba
-    has_prob = False
-    try:
-        probabilities = model.predict_proba(input_scaled)[0]
-        prob_stay = probabilities[0]
-        prob_churn = probabilities[1]
-        has_prob = True
-    except AttributeError:
-        pass # ถ้า Error ให้ข้ามไปเลย ไม่ต้องแสดงเปอร์เซ็นต์
+    with col2:
+        st.subheader("💰 พฤติกรรมการใช้จ่าย")
+        months = st.number_input("เป็นลูกค้ามาแล้ว (เดือน)", 0, 120, 36)
+        trans_amt = st.number_input("ยอดรูดรวม 12 เดือน ($)", 0, 50000, 4500)
+        trans_ct = st.number_input("จำนวนครั้งที่รูดบัตร (ครั้ง)", 0, 500, 65)
+        rev_bal = st.number_input("ยอดหนี้ค้างชำระ ($)", 0, 10000, 1500)
 
-    st.subheader("📊 ผลการวิเคราะห์ลูกค้า")
+    predict_button = st.button("🚀 เริ่มการวิเคราะห์เดี๋ยวนี้")
 
-    # แสดงผลลัพธ์
-    if str(prediction) == "1":
-        st.error("### ⚠️ ลูกค้ากลุ่มเสี่ยง (High Risk)")
-        st.write("ระบบประเมินว่าลูกค้ารายนี้จัดอยู่ในกลุ่มเสี่ยง มีแนวโน้มที่จะยกเลิกบัตรเครดิต")
-        if has_prob:
-            st.progress(float(prob_churn), text=f"โอกาสยกเลิกบัตร: {prob_churn*100:.1f}%")
-            
-    elif str(prediction) == "0":
-        st.success("### ✅ ลูกค้าปกติ (Loyal Customer)")
-        st.write("ระบบประเมินว่าลูกค้ารายนี้มีแนวโน้มที่จะใช้งานบัตรต่อไปตามปกติ")
-        if has_prob:
-            st.progress(float(prob_stay), text=f"โอกาสใช้งานต่อ: {prob_stay*100:.1f}%")
-            
-    else:
-        # กรณีโมเดลเป็นแบบจัดกลุ่ม (Segmentation) ไม่ใช่ 0 กับ 1
-        st.info(f"### 🎯 ผลการจัดกลุ่ม: {prediction}")
-        st.write("ระบบจัดลูกค้าท่านนี้อยู่ในกลุ่มตามที่แสดงด้านบน")
+if predict_button:
+    with tab2:
+        # Prepare Data
+        input_df = pd.DataFrame({
+            'Customer_Age': [customer_age], 'Gender': [gender],
+            'Income_Category': [income], 'Card_Category': [card],
+            'Months_on_book': [months], 'Total_Trans_Amt': [trans_amt],
+            'Total_Trans_Ct': [trans_ct], 'Total_Revolving_Bal': [rev_bal]
+        })
+        
+        input_encoded = pd.get_dummies(input_df)
+        input_aligned = input_encoded.reindex(columns=model_columns, fill_value=0)
+        input_scaled = scaler.transform(input_aligned)
+        
+        prediction = model.predict(input_scaled)[0]
+        
+        # แสดง Metrics สำคัญก่อน
+        m1, m2, m3 = st.columns(3)
+        m1.metric("ยอดใช้จ่ายรวม", f"${trans_amt:,.0f}")
+        m2.metric("ความถี่การใช้งาน", f"{trans_ct} ครั้ง/ปี")
+        m3.metric("หนี้คงค้าง", f"${rev_bal:,.0f}", delta_color="inverse")
 
-    with st.expander("📋 ดูข้อมูลที่ใช้คำนวณ"):
-        st.dataframe(input_df, use_container_width=True)
+        st.divider()
+
+        # แสดงผลลัพธ์แบบเน้นสี
+        if str(prediction) == "1":
+            st.error("## ⚠️ผลลัพธ์: มีความเสี่ยงที่จะยกเลิกบัตร (Churn Risk)")
+            st.markdown("""
+                **💡 คำแนะนำสำหรับฝ่ายการตลาด:**
+                * ควรโทรติดต่อเพื่อสอบถามความพึงพอใจ
+                * เสนอโปรโมชั่นลดค่าธรรมเนียมรายปี
+                * เพิ่มสิทธิประโยชน์ในการแลกแต้ม
+            """)
+        else:
+            st.success("## ✅ผลลัพธ์: ลูกค้ากลุ่มภักดี (Loyal Customer)")
+            st.markdown("""
+                **💡 คำแนะนำสำหรับฝ่ายการตลาด:**
+                * เสนอการอัปเกรดหน้าบัตร (เช่น จาก Blue เป็น Gold)
+                * ส่งคำเชิญเข้าร่วมกิจกรรมพิเศษสำหรับ Exclusive Member
+                * มอบของขวัญพิเศษในเดือนเกิด
+            """)
+        
+        # เพิ่มชาร์ตเล็กๆ ให้ดูว้าว
+        st.write("🔍 **เปรียบเทียบยอดใช้จ่ายกับค่าเฉลี่ย**")
+        chart_data = pd.DataFrame({
+            'Category': ['ลูกค้าคนนี้', 'ค่าเฉลี่ยลูกค้าทั่วไป'],
+            'ยอดใช้จ่าย ($)': [trans_amt, 4400]
+        })
+        st.bar_chart(chart_data.set_index('Category'))
+
+else:
+    with tab2:
+        st.info("กรุณากดปุ่มเริ่มการวิเคราะห์")
