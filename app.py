@@ -15,37 +15,49 @@ st.set_page_config(
 # แก้ไขส่วน CSS ใน app.py
 st.markdown("""
     <style>
-    /* 1. พื้นหลังแอปสีเทาอ่อนสะอาดตา */
+    /* 1. เปลี่ยนพื้นหลังหลักเป็นสีดำ/เทาเข้ม */
     .stApp {
-        background-color: #f8f9fa;
+        background-color: #121212;
     }
     
-    /* 2. บังคับสีตัวหนังสือหลักให้เป็นสีน้ำเงินเข้ม/ดำ (กันหน้าขาว) */
+    /* 2. บังคับสีตัวหนังสือหลักทั้งหมดเป็นสีขาว/สว่าง (สู้หน้าจอมืด) */
     .stApp p, .stApp span, .stApp label, .stApp div {
-        color: #1e293b !important;
+        color: #e2e8f0 !important;
     }
 
-    /* 3. หัวข้อต้องเด่น */
-    h1, h2, h3 {
-        color: #0f172a !important;
+    /* 3. หัวข้อต้องขาวเด่นชัด */
+    h1, h2, h3, h4, h5, h6 {
+        color: #ffffff !important;
         font-weight: bold !important;
     }
 
-    /* 4. ปรับสีปุ่มให้เด่นและตัวหนังสือขาว */
+    /* 4. ปรับสีปุ่มให้เด่นชัด ตัวหนังสือสีขาว */
     .stButton>button {
         width: 100%;
         border-radius: 10px;
         height: 3em;
-        background-color: #007bff;
-        color: white !important; /* ตัวหนังสือบนปุ่มต้องขาว */
+        background-color: #ff4b4b; /* เปลี่ยนเป็นสีแดงโทน Streamlit ให้ตัดกับพื้นหลังดำ */
+        color: white !important;
         font-weight: bold;
         border: none;
     }
+    .stButton>button:hover {
+        background-color: #ff3333;
+        color: white !important;
+    }
 
-    /* 5. ปรับ Sidebar ให้ดูมีมิติ */
+    /* 5. ปรับ Sidebar ให้เป็นสีเทาเข้มตัดกับพื้นหลัก */
     [data-testid="stSidebar"] {
-        background-color: #ffffff;
-        border-right: 1px solid #e2e8f0;
+        background-color: #1e1e1e;
+        border-right: 1px solid #333333;
+    }
+
+    /* 6. แก้ไขสีตัวหนังสือใน Tabs */
+    button[data-baseweb="tab"] p {
+        color: #e2e8f0 !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] p {
+        color: #ff4b4b !important; /* สีของ Tab ที่ถูกเลือก */
     }
     </style>
     """, unsafe_allow_html=True)
