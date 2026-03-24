@@ -81,7 +81,7 @@ with st.sidebar:
     st.write("📊**Algorithm:** Gradient Boosting")
 
 # 4. Main UI
-st.title("💳 ระบบวิเคราะห์ความเสี่ยงลูกค้าบัตรเครดิต")
+st.title("💳Credit card customer risk analysis system")
 st.write("---")
 
 tab1, tab2 = st.tabs(["📝กรอกข้อมูลลูกค้า", "📊ผลการวิเคราะห์"])
