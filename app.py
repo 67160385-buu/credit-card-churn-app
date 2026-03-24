@@ -13,42 +13,15 @@ st.set_page_config(
 # Custom CSS เพื่อให้ปุ่มและตัวอักษรสวยขึ้น
 st.markdown("""
     <style>
-    /* เปลี่ยนสีพื้นหลังหลักเป็นสีเทาอ่อนมาก */
-    .stApp {
-        background-color: #f8f9fa;
+    .main {
+        background-color: #f5f7f9;
     }
-    
-    /* ปรับแต่งแถบ Sidebar ให้เป็นสีขาวสะอาด */
-    [data-testid="stSidebar"] {
-        background-color: #ffffff;
-        border-right: 1px solid #e0e0e0;
-    }
-    
-    /* ปรับแต่งการแสดงผลของ Card หรือ Metric */
-    [data-testid="stMetricValue"] {
-        color: #007bff;
-    }
-    
-    /* ปรับแต่งปุ่มให้เป็นสีน้ำเงินเข้มและขอบมน */
     .stButton>button {
         width: 100%;
-        border-radius: 8px;
+        border-radius: 10px;
         height: 3em;
-        background-color: #0056b3;
+        background-color: #007bff;
         color: white;
-        border: none;
-        transition: 0.3s;
-    }
-    
-    .stButton>button:hover {
-        background-color: #004494;
-        border: none;
-        color: white;
-    }
-
-    /* ปรับแต่งหัวข้อ */
-    h1, h2, h3 {
-        color: #1e293b;
     }
     </style>
     """, unsafe_allow_html=True)
